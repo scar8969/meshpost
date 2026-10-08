@@ -1,0 +1,35 @@
+openapi: 3.0.0
+info:
+  title: "📐 sim-post"
+  version: 0.1.0
+paths:
+  /api/cases:
+    post:
+      summary: upload
+      responses:
+        "200":
+          description: ok
+  /api/cases/<id>:
+    get:
+      summary: case info
+      responses:
+        "200":
+          description: ok
+  /api/cases/<id>/section:
+    get:
+      summary: section cut
+      responses:
+        "200":
+          description: ok
+  /api/cases/<id>/probe:
+    get:
+      summary: probe
+      responses:
+        "200":
+          description: ok
+  /api/reports:
+    post:
+      summary: report
+      responses:
+        "200":
+          description: ok

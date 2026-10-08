@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Report #{{ case.id }} · {{ app_name }}{% endblock %}
+{% block nav %}<a href="{{ url_for('index') }}">Upload</a><a href="{{ url_for('report_view', cid=case.id) }}">Report #{{ case.id }}</a>{% endblock %}
+{% block navright %}<span class="tag g">{{ case.format }}</span>{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="row"><h2 style="flex:1">{{ case.name }}</h2>
+    <span class="tag g">{{ "{:,}".format(case.nodes or 0) }} nodes</span>
+    <span class="tag">{{ field_stats | length }} fields</span></div>
+  <div class="mono dim">source {{ case.file_path or 'not stored' }}</div>
+  <div class="mono dim">created {{ case.created_at }}</div>
+</div>
+
+<div class="card">
+  <h4>field statistics</h4>
+  <table>
+    <tr><th>field</th><th>min</th><th>max</th><th>mean</th><th>range</th></tr>
+    {% for f in field_stats %}
+    <tr><td>{{ f.name }}</td><td class="mono">{{ f.min }}</td><td class="mono">{{ f.max }}</td>
+        <td class="mono">{{ f.mean }}</td><td class="mono dim">{{ f.max - f.min }}</td></tr>
+    {% else %}
+    <tr><td colspan="5" class="mono dim">no field rows for case {{ case.id }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="card">
+  <div class="row">
+    <button class="btn g" id="export-csv" type="button"{% if not field_stats %} disabled{% endif %}>Export CSV</button>
+    <a class="mono dim" href="{{ url_for('post.get_case', cid=case.id) }}">/api/cases/{{ case.id }}</a>
+    <a class="mono dim" href="{{ url_for('post.section', cid=case.id) }}?axis=z&amp;value=0.5">/api/cases/{{ case.id }}/section?axis=z&amp;value=0.5</a>
+    <a class="mono dim" href="{{ url_for('post.probe_point', cid=case.id) }}?x=0&amp;y=0&amp;z=0">/api/cases/{{ case.id }}/probe?x=0&amp;y=0&amp;z=0</a>
+  </div>
+  <div class="mono dim" id="export-note">{{ export_note }}</div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='app.js') }}" defer></script>{% endblock %}

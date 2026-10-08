@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Upload · {{ app_name }}{% endblock %}
+{% block nav %}<a href="{{ url_for('index') }}">Upload</a><a href="#cases">Cases</a><a href="#compare">Compare</a>{% endblock %}
+{% block content %}
+<form class="card dropzone" id="upload-form" method="post" action="{{ url_for('start_case') }}" enctype="multipart/form-data">
+  <div style="font-size:24px">📄</div>
+  <div style="font-size:14px;margin-top:4px">Upload a CSV or VTK result file, {{ case_name }}</div>
+  <input type="file" id="result-file" name="file" accept=".csv,.vtk" style="margin-top:12px">
+  <div class="row" style="justify-content:center;margin-top:12px">
+    <label for="case-name" class="dim">Case name</label>
+    <input id="case-name" name="name" value="{{ case_name }}">
+    <label for="case-format" class="dim">Format</label>
+    <select id="case-format" name="format">
+      <option value="csv"{% if case_format == 'csv' %} selected{% endif %}>csv</option>
+      <option value="vtk"{% if case_format == 'vtk' %} selected{% endif %}>vtk</option>
+    </select>
+    <button class="btn" id="new-case" type="submit">Upload &amp; Analyze</button>
+  </div>
+  <div class="mono dim" style="margin-top:10px" id="upload-result">{{ log }}</div>
+  <div class="mono dim" style="margin-top:4px">registers the case and opens its report; the file itself is parsed by POST {{ url_for('post.upload') }} (multipart, field <b>file</b>)</div>
+</form>
+
+<div class="card">
+  <div class="row"><h2 style="flex:1">latest analysed case</h2>
+    {% if latest_case %}<a class="mono dim" href="{{ url_for('report_view', cid=latest_case.id) }}">full report #{{ latest_case.id }} →</a>{% endif %}</div>
+  <div class="row">
+    <div class="stat"><b id="stat-nodes">{{ "{:,}".format(stats.nodes) }}</b><span>nodes</span></div>
+    <div class="stat"><b id="stat-fields">{{ stats.fields }}</b><span>fields</span></div>
+    <div class="stat"><b id="stat-active">{{ active_case or '—' }}</b><span>case id</span></div>
+  </div>
+  {% if latest_case %}
+  <div class="mono dim">{{ latest_case.name }} · {{ latest_case.format }} · {{ "{:,}".format(latest_case.nodes or 0) }} nodes · {{ stats.fields_list | join(' · ') }}</div>
+  {% else %}
+  <div class="mono dim">no rows in the cases table yet — upload a file above to populate fields (min/max/mean come from post.fields.stats)</div>
+  {% endif %}
+</div>
+
+<div class="card" id="cases">
+  <h4>cases table</h4>
+  <table>
+    <tr><th>id</th><th>name</th><th>format</th><th>nodes</th><th>fields</th><th>created</th><th></th></tr>
+    {% for c in recent_cases %}
+    <tr><td class="mono">{{ c.id }}</td><td>{{ c.name }}</td><td><span class="tag">{{ c.format }}</span></td>
+        <td class="mono">{{ "{:,}".format(c.nodes or 0) }}</td>
+        <td class="mono dim">{{ c.fields_json }}</td>
+        <td class="mono dim">{{ c.created_at }}</td>
+        <td><a class="mono" href="{{ url_for('report_view', cid=c.id) }}">report →</a></td></tr>
+    {% else %}
+    <tr><td colspan="7" class="mono dim">no rows in the cases table yet</td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="card" id="compare">
+  <div class="row"><label for="compare-select" class="dim">compare with</label>
+    <select id="compare-select">
+      {% for c in recent_cases %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+      {% if not recent_cases %}<option value="">no cases</option>{% endif %}
+    </select>
+    <button class="btn g" id="export-csv" type="button">Export CSV</button>
+    <span class="sp"></span>
+    <a class="mono dim" href="{{ url_for('api_config') }}">/api/config</a>
+  </div>
+  <div class="mono dim">section cuts and probes are served per case at /api/cases/&lt;id&gt;/section and /api/cases/&lt;id&gt;/probe</div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='app.js') }}" defer></script>{% endblock %}

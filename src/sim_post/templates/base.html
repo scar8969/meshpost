@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" data-app="sim-post">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}sim-post · simulation post-processor{% endblock %}</title>
+<style>
+:root{--bg:#0d0f16;--panel:#141826;--line:#242a3d;--ink:#e8e9f2;--dim:#8b91ab;--accent:#7a6cff;--data:#4fd1c5;--warn:#ffb457;--bad:#ff6b81}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:14px/1.5 "Segoe UI",Roboto,-apple-system,sans-serif;display:flex;flex-direction:column;min-height:100vh}
+header{display:flex;align-items:center;gap:16px;padding:12px 22px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#171c2c,#141826)}
+header .brand{font-weight:700;font-size:15px;letter-spacing:.01em;color:var(--ink)}
+header .brand span{color:var(--accent)}
+header .brand em{font-style:normal;color:var(--dim);font-weight:400;font-size:12px;margin-left:8px}
+header nav{display:flex;gap:16px;font-size:13px}
+header nav a{color:var(--dim);text-decoration:none}
+header nav a:hover{color:var(--accent)}
+header .right{margin-left:auto;display:flex;gap:8px;align-items:center;font-size:12px}
+main{flex:1;padding:20px 22px 34px;max-width:1120px;width:100%;margin:0 auto}
+h1,h2,h3{font-size:17px;font-weight:650;letter-spacing:-.01em}
+h4{font-size:12px;font-weight:650;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);margin-bottom:9px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 1px 0 rgba(255,255,255,.02)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.row:last-child{margin-bottom:0}
+.sp{flex:1}
+.mono{font-family:ui-monospace,Consolas,monospace;font-size:12px}
+.dim{color:var(--dim)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--dim);font-weight:600;padding:9px 10px;border-bottom:1px solid var(--line);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+td{padding:9px 10px;border-bottom:1px solid #1c2133}
+tr:hover td{background:#181d2e}
+input,select,button{font:inherit}
+input,select{background:#0a0c13;border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:7px 11px;font-size:13px}
+button,.btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 15px;font-size:13px;font-weight:600;cursor:pointer}
+button:hover{filter:brightness(1.08)}
+button.ghost,.btn.g{background:transparent;border:1px solid var(--line);color:var(--ink);font-weight:500}
+button.danger,.btn.r{background:transparent;border:1px solid var(--bad);color:var(--bad);font-weight:500}
+[disabled]{opacity:.45;cursor:not-allowed}
+.tag{display:inline-block;background:rgba(122,108,255,.14);color:#b3a9ff;border-radius:999px;padding:3px 11px;font-size:11px;font-weight:600}
+.tag.g{background:rgba(79,209,197,.14);color:var(--data)}
+.tag.y{background:rgba(255,180,87,.14);color:var(--warn)}
+.stat{display:flex;flex-direction:column;padding-right:22px}
+.stat b{font-size:24px;font-weight:650;letter-spacing:-.02em}
+.stat span{color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.07em}
+.dropzone{border:1.5px dashed var(--line);border-radius:12px;padding:26px;text-align:center;background:#0f1320}
+.dropzone:hover{border-color:var(--accent)}
+.code{background:#0a0c13;border:1px solid var(--line);border-radius:8px;padding:10px;font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--dim);white-space:pre-wrap;word-break:break-word;overflow-x:auto}
+.flash{background:rgba(122,108,255,.12);border:1px solid var(--accent);border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:13px}
+footer{border-top:1px solid var(--line);padding:14px 22px;color:var(--dim);font-size:12px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+footer a{color:var(--dim)}
+footer a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">sim<span>-</span>post <em>simulation post-processor</em></span>
+  <nav>{% block nav %}<a href="{{ url_for('index') }}">Upload</a>{% endblock %}</nav>
+  <span class="right">{% block navright %}<span class="tag{% if case_count %} g{% endif %}">{{ case_count }} case(s)</span>{% endblock %}</span>
+</header>
+<main>
+{% with msgs = get_flashed_messages() %}{% if msgs %}{% for m in msgs %}<div class="flash">{{ m }}</div>{% endfor %}{% endif %}{% endwith %}
+{% block content %}{% endblock %}
+</main>
+<footer>
+  <span>sim-post 0.1.0</span>
+  <span class="dim">data dir {{ data_dir }}</span>
+  {% for c in recent_cases %}<a href="{{ url_for('report_view', cid=c.id) }}">report #{{ c.id }}</a>{% endfor %}
+  <span class="sp"></span>
+  <a href="{{ url_for('api_health') }}">/api/health</a>
+  <a href="{{ url_for('api_config') }}">/api/config</a>
+</footer>
+{% block scripts %}{% endblock %}
+</body>
+</html>
