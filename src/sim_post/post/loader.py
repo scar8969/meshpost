@@ -1,8 +1,10 @@
 import csv
+from typing import Any
 
 
 def load_csv(path):
-    nodes, fields = [], {}
+    nodes: list[Any] = []
+    fields: dict[str, list[float]] = {}
     with open(path) as f:
         reader = csv.reader(f)
         header = next(reader)
@@ -26,7 +28,7 @@ def load_vtk(path):
     if i >= len(lines):
         raise ValueError("no POINTS in vtk")
     n = int(lines[i].split()[1])
-    coords = []
+    coords: list[Any] = []
     i += 1
     while len(coords) < n:
         coords += [float(x) for x in lines[i].split()]
@@ -37,7 +39,7 @@ def load_vtk(path):
         if "SCALARS" in lines[i]:
             name = lines[i].split()[1]
             i += 2  # skip LOOKUP_TABLE
-            vals = []
+            vals: list[float] = []
             while i < len(lines) and len(vals) < n:
                 vals += [float(x) for x in lines[i].split()]
                 i += 1

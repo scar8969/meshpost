@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 from flask import Blueprint, abort, jsonify, request
 
@@ -10,7 +11,7 @@ from .sections import probe, section_cut
 
 bp = Blueprint("post", __name__)
 DATA_DIR = str(paths.DATA_DIR)
-_cases = {}  # id -> parsed case dict (in-memory for simplicity)
+_cases: dict[str, Any] = {}  # id -> parsed case dict (in-memory for simplicity)
 
 
 @bp.post("/api/cases")
@@ -20,7 +21,7 @@ def upload():
         return jsonify({"error": "no file"}), 400
     fmt = request.form.get("format", "csv")
     os.makedirs(DATA_DIR, exist_ok=True)
-    path = os.path.join(DATA_DIR, f.filename)
+    path = os.path.join(DATA_DIR, f.filename or "upload")
     f.save(path)
     try:
         case = load_csv(path) if fmt == "csv" else load_vtk(path)
@@ -85,9 +86,9 @@ def probe_point(cid):
         {
             "values": probe(
                 case,
-                request.args.get("x", 0, type=float),
-                request.args.get("y", 0, type=float),
-                request.args.get("z", 0, type=float),
+                request.args.get("x", 0.0, type=float),
+                request.args.get("y", 0.0, type=float),
+                request.args.get("z", 0.0, type=float),
             )
         }
     )
