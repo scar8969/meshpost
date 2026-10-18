@@ -9,7 +9,7 @@ they do, and what breaks first under load.
 
 ## 1. Context
 
-c2_sim_post is a single-process Flask service. It owns its own database (SQLite by
+meshpost is a single-process Flask service. It owns its own database (SQLite by
 default, any SQLAlchemy-supported backend via `DATABASE_URL`) and is deployed
 behind a reverse proxy or an orchestrator.
 
@@ -74,7 +74,7 @@ flowchart TB
 | `templates/base.html` | asset |
 | `templates/index.html` | asset |
 | `templates/report.html` | asset |
-| `tests/test_c2_sim_post.py` | module |
+| `tests/test_meshpost.py` | module |
 | `_app.py` | asset |
 
 ---
@@ -137,8 +137,8 @@ writable lives under `/app`.
 
 | Table | Owner |
 | --- | --- |
-| `cases` | owned by `c2_sim_post` |
-| `fields` | owned by `c2_sim_post` |
+| `cases` | owned by `meshpost` |
+| `fields` | owned by `meshpost` |
 
 Tables are created by the application's own bootstrap on first use. No migration
 tool is wired in; the schema is additive, and the service tolerates a missing or

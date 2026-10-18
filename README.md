@@ -1,4 +1,4 @@
-# sim-post
+# meshpost
 
 > A Flask post-processor for FEA/CFD result files. It ingests a CSV or VTK mesh,
 
@@ -6,8 +6,8 @@
 [![python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-c2_sim_post is a Flask service delivered as an installable, typed, test-covered
-distribution. The business logic is unchanged from the original skeleton; what
+meshpost is a Flask service delivered as an installable, typed, test-covered
+distribution. The business logic is unchanged from the original service; what
 is new is the engineering around it: a packaging story, a configuration
 contract, structured observability, operational endpoints, a hardened
 container, and the gates that keep all of that true.
@@ -17,7 +17,7 @@ container, and the gates that keep all of that true.
 ## Quickstart
 
 ```sh
-git clone <your-fork> c2_sim_post && cd c2_sim_post
+git clone <your-fork> meshpost && cd meshpost
 python -m venv .venv
 . .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
@@ -134,7 +134,7 @@ variable, rather than surfacing as a confusing runtime error later.
 | `/api/reports` | S | JSON |
 | `/api/reports` | T | JSON |
 
-The frozen machine-readable contract is `openapi/c2_sim_post.yaml`; it is the
+The frozen machine-readable contract is `openapi/meshpost.yaml`; it is the
 source of truth for path and method coverage.
 
 ---
@@ -152,9 +152,9 @@ source of truth for path and method coverage.
 │   ├── ARCHITECTURE.md
 │   └── OPERATIONS.md
 ├── openapi
-│   └── c2_sim_post.yaml
+│   └── meshpost.yaml
 ├── schema
-│   └── c2_sim_post.sql
+│   └── meshpost.sql
 ├── src
 │   └── sim_post
 │       ├── post
@@ -173,7 +173,7 @@ source of truth for path and method coverage.
 │       └── py.typed
 ├── tests
 │   ├── conftest.py
-│   ├── test_c2_sim_post.py
+│   ├── test_meshpost.py
 │   ├── test_config.py
 │   └── test_ops.py
 ├── .dockerignore

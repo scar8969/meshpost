@@ -1,4 +1,4 @@
-"""C2 sim-post — tests. Run: pytest test_c2_sim_post.py"""
+"""C2 sim-post — tests. Run: pytest test_meshpost.py"""
 import sys, os
 
 import pytest

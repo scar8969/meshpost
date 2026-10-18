@@ -3,13 +3,13 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "c2-sim-post"
+name = "meshpost"
 version = "0.1.0"
-description = "A Flask post-processor for FEA/CFD result files. It ingests a CSV or VTK mesh,"
+description = "FEA/CFD post-processor: ingest CSV or VTK meshes, slice sections, probe fields, export reports."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-authors = [{ name = "project-skeletons maintainers" }]
+authors = [{ name = "Priyanshu Rout" }]
 keywords = ["flask", "service", "sim_post"]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -46,7 +46,7 @@ Documentation = "https://example.invalid/sim_post/docs"
 Issues = "https://example.invalid/sim_post/issues"
 
 [project.scripts]
-c2-sim-post = "sim_post.cli:main"
+meshpost = "sim_post.cli:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }

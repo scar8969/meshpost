@@ -34,7 +34,7 @@ RUN groupadd --system --gid 1001 app \
 WORKDIR /app
 
 COPY --from=builder /wheels /wheels
-RUN python -m pip install --no-cache-dir --no-index --find-links=/wheels c2-sim-post \
+RUN python -m pip install --no-cache-dir --no-index --find-links=/wheels meshpost \
  && rm -rf /wheels \
  && mkdir -p /var/lib/sim_post/instance /var/lib/sim_post/log \
  && chown -R app:app /var/lib/sim_post /app
