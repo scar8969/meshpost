@@ -7,22 +7,27 @@ project's SQLite file directly, and "serve" is the only subcommand that imports
 Flask, lazily inside the function, which keeps `python cli.py --help` usable
 without the web dependencies installed.
 """
+
 from __future__ import annotations
 
 import argparse
 import json
 import os
 import sqlite3
+
 from . import paths
 
 ROOT = str(paths.PROJECT_ROOT)
 VERSION = "0.1.0"
 DEFAULT_DB = str(paths.INSTANCE_DIR / "simpost.db")
 
+
 def _load(path: str, fmt: str) -> dict:
     from .post.loader import load_csv, load_vtk
+
     fmt = fmt or ("vtk" if path.lower().endswith(".vtk") else "csv")
     return load_csv(path) if fmt == "csv" else load_vtk(path)
+
 
 def cmd_stats(args) -> int:
     from .post.fields import normalize, stats
@@ -39,6 +44,7 @@ def cmd_stats(args) -> int:
         print(json.dumps(rows, indent=2))
     return 0
 
+
 def cmd_section(args) -> int:
     from .post.sections import section_cut
 
@@ -48,6 +54,7 @@ def cmd_section(args) -> int:
     for p in pts[: args.limit or len(pts)]:
         print(f"  x={p[0]:<9.4g} y={p[1]:<9.4g} value={p[2]:.4g}")
     return 0
+
 
 def cmd_probe(args) -> int:
     from .post.sections import probe
@@ -60,6 +67,7 @@ def cmd_probe(args) -> int:
             print(f"  {key:<14} {value:.6g}")
     return 0
 
+
 def cmd_cases(args) -> int:
     db = args.db or os.environ.get("SIMPOST_DB", DEFAULT_DB)
     if not os.path.exists(db):
@@ -71,27 +79,34 @@ def cmd_cases(args) -> int:
         if not cols:
             print(f"{db} has no cases table")
             return 0
-        rows = list(con.execute("SELECT id, name, format, nodes, created_at FROM cases ORDER BY id"))
+        rows = list(
+            con.execute("SELECT id, name, format, nodes, created_at FROM cases ORDER BY id")
+        )
         print(f"{'id':>4} {'name':<20} {'fmt':<5} {'nodes':>7}  created")
         for r in rows:
             print(f"{r[0]:>4} {r[1]:<20} {r[2]:<5} {r[3]:>7}  {r[4]}")
-        for case_id, in con.execute("SELECT id FROM cases ORDER BY id"):
-            fields = list(con.execute(
-                "SELECT name, min, max, mean FROM fields WHERE case_id = ?", (case_id,)))
+        for (case_id,) in con.execute("SELECT id FROM cases ORDER BY id"):
+            fields = list(
+                con.execute("SELECT name, min, max, mean FROM fields WHERE case_id = ?", (case_id,))
+            )
             for name, lo, hi, mean in fields:
                 print(f"       {name:<14} min={lo:<12.4g} max={hi:<12.4g} mean={mean:.4g}")
     finally:
         con.close()
     return 0
 
+
 def cmd_serve(args) -> int:
     from ._app import app
+
     app.run(host=args.host, port=args.port, debug=False)
     return 0
 
+
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="sim-post",
-                                description="FEA/CFD post-processor: field stats, sections, probes.")
+    p = argparse.ArgumentParser(
+        prog="sim-post", description="FEA/CFD post-processor: field stats, sections, probes."
+    )
     p.add_argument("--version", action="version", version=f"sim-post {VERSION}")
     sub = p.add_subparsers(dest="command", required=True)
 
@@ -126,6 +141,7 @@ def build_parser() -> argparse.ArgumentParser:
     v.add_argument("--port", type=int, default=8000)
     v.set_defaults(func=cmd_serve)
     return p
+
 
 def main(argv=None) -> int:
     args = build_parser().parse_args(argv)

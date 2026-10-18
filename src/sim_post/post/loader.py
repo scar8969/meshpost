@@ -1,4 +1,5 @@
-import csv, re
+import csv
+
 
 def load_csv(path):
     nodes, fields = [], {}
@@ -13,6 +14,7 @@ def load_csv(path):
             for i, name in enumerate(header[3:]):
                 fields.setdefault(name, []).append(float(row[3 + i]))
     return {"nodes": nodes, "fields": fields}
+
 
 def load_vtk(path):
     nodes, fields = [], {}
@@ -29,7 +31,7 @@ def load_vtk(path):
     while len(coords) < n:
         coords += [float(x) for x in lines[i].split()]
         i += 1
-    nodes = [coords[j:j + 3] for j in range(0, 3 * n, 3)]
+    nodes = [coords[j : j + 3] for j in range(0, 3 * n, 3)]
     # SCALARS fields
     while i < len(lines):
         if "SCALARS" in lines[i]:

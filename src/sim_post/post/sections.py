@@ -2,10 +2,14 @@ def section_cut(case, axis, value):
     """Slice nodes where axis == value (nearest), return (x, y, field_val)."""
     idx = {"x": 0, "y": 1, "z": 2}[axis]
     points = []
-    for node, field in zip(case["nodes"], case["fields"].get("vonMises", case["fields"].get(list(case["fields"].keys())[0], []))):
+    for node, field in zip(
+        case["nodes"],
+        case["fields"].get("vonMises", case["fields"].get(list(case["fields"].keys())[0], [])),
+    ):
         if abs(node[idx] - value) < 0.05:
             points.append([node[0], node[1], field])
     return points
+
 
 def probe(case, x, y, z):
     """Nearest node."""

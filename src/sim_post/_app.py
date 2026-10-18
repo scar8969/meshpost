@@ -1,19 +1,23 @@
-from .post import api as post_api
-from .models import Case, Field, db
-from .post.api import bp
-from .post.loader import load_csv
+import os
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
-import os
+
 from . import paths
+from .models import Case, Field, db
+from .post import api as post_api
+from .post.api import bp
+from .post.loader import load_csv
 
 # Templates and static assets live at <project root>/templates and
 # <project root>/static, next to web/, so resolve them from this file instead
 # of the process working directory.
 
+
 def build_app():
     """Build the application: configuration, database, then routes."""
-    app = Flask(__name__, template_folder=str(paths.TEMPLATES_DIR), static_folder=str(paths.STATIC_DIR))
+    app = Flask(
+        __name__, template_folder=str(paths.TEMPLATES_DIR), static_folder=str(paths.STATIC_DIR)
+    )
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + str(paths.INSTANCE_DIR / "simpost.db")
     app.secret_key = os.environ.get("SIMPOST_SECRET", "sim-post-dev-secret")
     db.init_app(app)
@@ -23,16 +27,22 @@ def build_app():
 
     # Upload settings the operator last typed, plus the log of what the API did.
     # Templates render these (or rows from SQLite), never placeholder markup.
-    PAGE_STATE = {"case_name": "bracket_v2", "case_format": "csv", "log": "no upload yet",
-                  "export_note": "CSV export is served from the case rows on /"}
+    PAGE_STATE = {
+        "case_name": "bracket_v2",
+        "case_format": "csv",
+        "log": "no upload yet",
+        "export_note": "CSV export is served from the case rows on /",
+    }
     DATA_DIR = os.environ.get("SIMPOST_DATA_DIR", str(paths.DATA_DIR))
 
     def _cases():
         return Case.query.order_by(Case.id.desc()).all()
 
     def _field_stats(case):
-        return [{"name": f.name, "min": f.min, "max": f.max, "mean": f.mean}
-                for f in Field.query.filter_by(case_id=case.id).all()]
+        return [
+            {"name": f.name, "min": f.min, "max": f.max, "mean": f.mean}
+            for f in Field.query.filter_by(case_id=case.id).all()
+        ]
 
     @app.context_processor
     def inject_state():
@@ -44,14 +54,24 @@ def build_app():
             "app_name": "sim-post",
             "data_dir": DATA_DIR,
             "case_count": len(rows),
-            "recent_cases": [{"id": c.id, "name": c.name, "format": c.format,
-                              "nodes": c.nodes or 0, "fields_json": c.fields_json or "[]",
-                              "created_at": c.created_at} for c in rows[:20]],
+            "recent_cases": [
+                {
+                    "id": c.id,
+                    "name": c.name,
+                    "format": c.format,
+                    "nodes": c.nodes or 0,
+                    "fields_json": c.fields_json or "[]",
+                    "created_at": c.created_at,
+                }
+                for c in rows[:20]
+            ],
             "latest_case": latest,
-            "stats": {"nodes": latest.nodes if latest else 0,
-                      "fields": len(fields),
-                      "fields_list": [f["name"] for f in fields],
-                      "log": PAGE_STATE["log"]},
+            "stats": {
+                "nodes": latest.nodes if latest else 0,
+                "fields": len(fields),
+                "fields_list": [f["name"] for f in fields],
+                "log": PAGE_STATE["log"],
+            },
             "export_note": PAGE_STATE["export_note"],
             "case_name": request.args.get("case") or PAGE_STATE["case_name"],
             "case_format": request.args.get("format") or PAGE_STATE["case_format"],
@@ -92,12 +112,20 @@ def build_app():
                     case.fields_json = str(sorted((loaded.get("fields") or {}).keys()))
                     for fname, values in (loaded.get("fields") or {}).items():
                         series = [float(v) for v in values]
-                        db.session.add(Field(case_id=case.id, name=fname,
-                                             min=min(series), max=max(series),
-                                             mean=sum(series) / len(series),
-                                             data_json=str(series)))
+                        db.session.add(
+                            Field(
+                                case_id=case.id,
+                                name=fname,
+                                min=min(series),
+                                max=max(series),
+                                mean=sum(series) / len(series),
+                                data_json=str(series),
+                            )
+                        )
                     parsed = "%d node(s), fields %s" % (
-                        case.nodes, ", ".join(sorted(loaded.get("fields") or {})))
+                        case.nodes,
+                        ", ".join(sorted(loaded.get("fields") or {})),
+                    )
                 else:
                     parsed = "stored %d bytes (vtk parsing is CLI-only: cli.py section)" % len(raw)
             except Exception as exc:
@@ -106,7 +134,11 @@ def build_app():
         PAGE_STATE["case_name"] = name
         PAGE_STATE["case_format"] = fmt
         PAGE_STATE["log"] = "case #%d (%s, %s): %s" % (
-            case.id, name, fmt, parsed or "no file in the upload")
+            case.id,
+            name,
+            fmt,
+            parsed or "no file in the upload",
+        )
         flash("case #%d registered" % case.id)
         return redirect(url_for("report_view", cid=case.id))
 
@@ -117,14 +149,19 @@ def build_app():
     @app.get("/api/config")
     def api_config():
         """Data directory and supported formats the UI and CLI both read."""
-        return jsonify({"data_dir": DATA_DIR,
-                        "formats": ["csv", "vtk"],
-                        "cases": Case.query.count(),
-                        "database": app.config["SQLALCHEMY_DATABASE_URI"]})
+        return jsonify(
+            {
+                "data_dir": DATA_DIR,
+                "formats": ["csv", "vtk"],
+                "cases": Case.query.count(),
+                "database": app.config["SQLALCHEMY_DATABASE_URI"],
+            }
+        )
 
     if __name__ == "__main__":  # python -m web.app  (see Dockerfile CMD)
         app.run(host="0.0.0.0", port=int(os.environ.get("PORT", "8000")))
 
     return app
+
 
 app = build_app()

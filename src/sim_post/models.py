@@ -1,7 +1,9 @@
 from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+
 
 class Case(db.Model):
     __tablename__ = "cases"
@@ -12,6 +14,7 @@ class Case(db.Model):
     nodes = db.Column(db.Integer, default=0)
     fields_json = db.Column(db.Text, default="[]")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class Field(db.Model):
     __tablename__ = "fields"
