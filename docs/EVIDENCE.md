@@ -4,7 +4,7 @@ Every line below was produced by a command run against this exact checkout, on t
 
 | | |
 | --- | --- |
-| Generated | 2026-10-19 02:26 |
+| Generated | 2026-10-19 09:42 |
 | Python | 3.14.7 |
 | Platform | Windows 11 |
 
@@ -15,7 +15,7 @@ python -m pytest -q
 ```
 
 - exit code **0**
-- 25 passed in 1.17s
+- 25 passed in 1.28s
 
 ## Static gates
 
@@ -37,6 +37,25 @@ The application was imported through `wsgi.py` and each GET path declared in `op
 | 404 | `/api/cases/1/probe` | 51 | application/json |
 
 3 paths walked, 0 of them raised or answered 5xx.
+
+## CLI
+
+```
+usage: sim-post [-h] [--version] {stats,section,probe,cases,serve} ...
+
+FEA/CFD post-processor: field stats, sections, probes.
+
+positional arguments:
+  {stats,section,probe,cases,serve}
+    stats               min/max/mean per field of a result file
+    section             cut the mesh with an axis-aligned plane
+    probe               field values at the node nearest a point
+    cases               list the cases stored in the SQLite database
+    serve               run the Flask post-processing UI
+
+options:
+  -h, --help            show this help message and exit
+```
 
 ## Screenshots
 
