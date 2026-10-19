@@ -1,6 +1,6 @@
-from datetime import datetime
-
 from flask_sqlalchemy import SQLAlchemy
+
+from .clock import utcnow
 
 db = SQLAlchemy()
 
@@ -13,7 +13,7 @@ class Case(db.Model):
     file_path = db.Column(db.String(256), default="")
     nodes = db.Column(db.Integer, default=0)
     fields_json = db.Column(db.Text, default="[]")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utcnow)
 
 
 class Field(db.Model):
